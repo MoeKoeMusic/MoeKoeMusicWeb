@@ -1,0 +1,129 @@
+:root {
+  --vp-c-brand: #646cff;
+  --vp-c-brand-light: #747bff;
+  --vp-c-brand-dark: #535bf2;
+  
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+  
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #89f7fe60 30%, #66a6ff60);
+  --vp-home-hero-image-filter: blur(40px);
+}
+
+.VPHero .name,
+.VPHero .text {
+  background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 8s linear infinite;
+}
+
+.VPHero .tagline {
+  background: linear-gradient(120deg, #66a6ff 0%, #89f7fe 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0.8;
+}
+
+.VPButton.brand {
+  background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.VPButton.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 166, 255, 0.4);
+}
+
+.VPHero .image-bg {
+  opacity: 0.8;
+  transition: opacity 1s ease;
+}
+
+.VPHero .image-container:hover .image-bg {
+  opacity: 0.2;
+}
+
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.VPFeature {
+  background-color: var(--vp-c-bg)!important;
+  border-radius: 12px;
+  box-shadow: 0 24px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1)!important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+.VPFeature:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(102, 166, 255, 0.25);
+}
+
+.VPFeature::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(137, 247, 254, 0.05), rgba(102, 166, 255, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.VPFeature:hover::after {
+  opacity: 1;
+}
+
+/* 彩虹背景效果 */
+.VPHero {
+  position: relative;
+  overflow: hidden;
+}
+
+.VPHomeHero {
+  position: relative;
+  z-index: 1;
+}
+
+.VPHero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  --stripes: repeating-linear-gradient(100deg, #fff 0%, #fff 7%, transparent 10%, transparent 12%, #fff 16%);
+  --rainbow: repeating-linear-gradient(100deg, #89f7fe 10%, #66a6ff 15%, #e879f9 20%, #5eead4 25%, #89f7fe 30%);
+  background-image: var(--stripes), var(--rainbow);
+  background-size: 300%, 200%;
+  transform: translateZ(0px);
+  perspective: 1000px;
+  backface-visibility: hidden;
+  mask-image: radial-gradient(at 100% 0%, rgb(224, 255, 206) 40%, transparent 70%);
+  pointer-events: none;
+  animation: moveBackground 30s linear infinite;
+  opacity: 0.7;
+}
+
+.dark .VPHero::before {
+  filter: invert(0%);
+  opacity: 0.5;
+}
+
+@keyframes moveBackground {
+  0% {
+    background-position: 100% 0%, 100% 0%;
+  }
+  100% {
+    background-position: 0% 0%, 0% 0%;
+  }
+}
