@@ -50,10 +50,10 @@ export default defineConfig({
     },
     
     nav: [
-      { text: '快速开始', link: '#' },
+      { text: '快速开始', link: '/quick-start' },
       { text: '下载', link: '/download' },
       { text: '关于', link: '/about' },
-      { text: 'API', link: '/websocket-api' },
+      { text: 'API', link: '/api-docs' },
       { text: 'GitHub', link: 'https://github.com/iAJue/MoeKoeMusic' }
     ],
 
@@ -61,19 +61,33 @@ export default defineConfig({
       {
         text: '指南',
         items: [
-          { text: '快速开始', link: '#' },
-          { text: '安装说明', link: '#' },
-          { text: '开发部署', link: '#'},
-          { text: 'WebSocket', link: '/websocket-api' }
+          { text: '快速开始', link: '/quick-start' },
+          { text: '安装说明', link: '/installation' },
+          { text: '开发部署', link: '/development'},
+          { text: 'WebSocket API', link: '/websocket-api' },
+          { text: 'Web API', link: '/api-docs' },
+          { text: '许可证', link: 'https://github.com/iAJue/MoeKoeMusic?tab=GPL-2.0-1-ov-file#readme' },
+          { text: '贡献指南', link: 'https://github.com/iAJue/MoeKoeMusic/blob/main/CONTRIBUTING.md' },
+          { text: '贡献公约', link: 'https://github.com/iAJue/MoeKoeMusic?tab=coc-ov-file' }
         ]
       },
       {
-        text: '功能特性',
+        text: '故障排查',
         items: [
-          { text: '账号登录', link: '#' },
-          { text: '歌词显示', link: '#' },
-          { text: '每日推荐', link: '#' },
-          { text: '主题切换', link: '#' },
+          { text: '调试模式和错误排查', link: '/debug-mode' },
+          { text: 'macOS 常见问题', link: '/mac-troubleshooting' }
+        ]
+      },
+      {
+        text: '常见问题',
+        items: [
+          { text: '账号登录问题', link: '/faq/login-issues' },
+          { text: 'VIP相关问题', link: '/faq/vip-issues' },
+          { text: '服务器错误问题', link: '/faq/server-errors' },
+          { text: 'Mac系统应用显示已损坏', link: '/faq/mac-damaged' },
+          { text: 'macOS ARM设备API启动失败', link: '/faq/macos-api-failed' },
+          { text: 'Windows 7系统兼容性问题', link: '/faq/win7-compatibility' },
+          { text: '字体设置与自定义', link: '/faq/font-settings' }
         ]
       }
     ],
