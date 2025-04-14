@@ -87,7 +87,8 @@ export default defineConfig({
           { text: 'Mac系统应用显示已损坏', link: '/faq/mac-damaged' },
           { text: 'macOS ARM设备API启动失败', link: '/faq/macos-api-failed' },
           { text: 'Windows 7系统兼容性问题', link: '/faq/win7-compatibility' },
-          { text: '字体设置与自定义', link: '/faq/font-settings' }
+          { text: '字体设置与自定义', link: '/faq/font-settings' },
+          { text: '麦克风权限问题', link: '/faq/microphone-permission' }
         ]
       }
     ],

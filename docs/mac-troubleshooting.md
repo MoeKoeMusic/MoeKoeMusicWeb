@@ -34,6 +34,28 @@
    sudo spctl --master-enable
    ```
 
+
+## 麦克风权限问题
+
+在macOS系统上，部分用户可能会遇到以下麦克风权限问题：
+
+- 每次切换歌曲时都会弹出麦克风权限请求
+- 需要多次确认权限弹窗才能开始播放音乐
+
+### 解决方案
+
+修改应用包内的 Info.plist 文件
+
+`Info.plist` 文件位于 `MoeKoeMusic.app/Contents/Info.plist`。
+
+您可以在 Info.plist 文件中添加以下配置来禁用麦克风权限请求：
+
+```xml
+<key>NSMicrophoneUsageDescription</key>
+<string>We do not require microphone access.</string>
+```
+
+
 ## API 启动失败问题
 
 有些用户在 macOS 上（特别是 M1/M2 芯片的设备上）可能会遇到 API 启动失败的问题。
@@ -81,5 +103,6 @@ macOS 可能会要求多种权限，确保您允许以下权限：
 ## 相关问题链接
 
 - [macos15.2 arm打开应用显示API启动失败](https://github.com/iAJue/MoeKoeMusic/issues/214)
+- [麦克风权限问题](https://github.com/iAJue/MoeKoeMusic/issues/215)
 
 如果您遇到其他未在此文档中提及的问题，请在 [GitHub Issues](https://github.com/iAJue/MoeKoeMusic/issues) 中提交问题报告。 
