@@ -97,6 +97,11 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/iAJue/MoeKoeMusic' }
     ],
 
+    editLink: {
+      pattern: 'https://github.com/MoeKoeMusic/MoeKoeMusicWeb/edit/main/docs/:path',
+      text: '在 GitHub 上编辑此页面'
+    },
+
     footer: {
       message: '基于 GPL-2.0 license 发布',
       copyright: 'Copyright © 2025 MoeKoe Music'
