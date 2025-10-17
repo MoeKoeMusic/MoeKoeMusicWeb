@@ -79,6 +79,13 @@ export default defineConfig({
         ]
       },
       {
+        text: '功能说明',
+        items: [
+          { text: '网络模式切换', link: '/guide/network-modes' },
+          { text: '字体设置与自定义', link: '/guide/font-settings' },
+        ]
+      },
+      {
         text: '常见问题',
         items: [
           { text: '账号登录问题', link: '/faq/login-issues' },
@@ -87,7 +94,6 @@ export default defineConfig({
           { text: 'Mac系统应用显示已损坏', link: '/faq/mac-damaged' },
           { text: 'macOS ARM设备API启动失败', link: '/faq/macos-api-failed' },
           { text: 'Windows 7系统兼容性问题', link: '/faq/win7-compatibility' },
-          { text: '字体设置与自定义', link: '/faq/font-settings' },
           { text: '麦克风权限问题', link: '/faq/microphone-permission' }
         ]
       }
