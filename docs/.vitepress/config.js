@@ -83,6 +83,8 @@ export default defineConfig({
         items: [
           { text: '网络模式切换', link: '/guide/network-modes' },
           { text: '字体设置与自定义', link: '/guide/font-settings' },
+          { text: '数据源说明', link: '/guide/data-source' },
+          { text: '音频响度平衡', link: '/guide/volume-normalization' },
         ]
       },
       {
@@ -94,6 +96,7 @@ export default defineConfig({
           { text: 'Mac系统应用显示已损坏', link: '/faq/mac-damaged' },
           { text: 'macOS ARM设备API启动失败', link: '/faq/macos-api-failed' },
           { text: 'Windows 7系统兼容性问题', link: '/faq/win7-compatibility' },
+          { text: 'Ubuntu系统沙箱启动失败', link: '/faq/ubuntu-sandbox' },
           { text: '麦克风权限问题', link: '/faq/microphone-permission' }
         ]
       }

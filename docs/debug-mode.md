@@ -21,6 +21,14 @@
 - **macOS**：`/Users/<YourUsername>/Library/Logs/moekoemusic/main.log`
 - **Linux**：`/home/<YourUsername>/.config/moekoemusic/logs/main.log`
 
+## 缓存文件路径
+
+对于遇到位置错误,可以尝试删除缓存目录,重新启动软件,或在设置中恢复出厂设置(如果你进得去的话)
+
+- **Windows**：`C:\Users\<YourUsername>\AppData\Roaming\moekoemusic`
+- **macOS**：`/Users/<YourUsername>/Library/Logs/moekoemusic`
+- **Linux**：`/home/<YourUsername>/.config/moekoemusic`
+
 ## 常见错误排查
 
 ### 1. 应用无法启动
