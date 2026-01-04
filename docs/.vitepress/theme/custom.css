@@ -127,3 +127,33 @@
     background-position: 0% 0%, 0% 0%;
   }
 }
+
+.share-lyrics-page .Layout,
+.share-lyrics-page .VPContent,
+.share-lyrics-page .VPDoc,
+.share-lyrics-page .vp-doc {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.share-lyrics-page .VPNav,
+.share-lyrics-page .VPSidebar,
+.share-lyrics-page .VPDocAside,
+.share-lyrics-page .VPDocFooter,
+.share-lyrics-page .VPLocalNav,
+.share-lyrics-page .VPHomeHero,
+.share-lyrics-page .VPHomeFeatures {
+  display: none !important;
+}
+
+.share-lyrics-page .VPContent .VPDoc,
+.share-lyrics-page .vp-doc > div,
+.share-lyrics-page .VPDoc > .container {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
