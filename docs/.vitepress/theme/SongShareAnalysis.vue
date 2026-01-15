@@ -49,12 +49,20 @@
               </div>
             </div>
             <p class="audio-notice" v-if="audioNotice">{{ audioNotice }}</p>
+            <div class="audio-blocked" v-if="audioLoadError && audioLoadErrorUrl">
+              <p class="audio-blocked-title">{{ audioLoadError }}</p>
+              <p class="audio-blocked-url">
+                播放地址：
+                <a :href="audioLoadErrorUrl" target="_blank" rel="noreferrer">{{ audioLoadErrorUrl }}</a>
+              </p>
+            </div>
           </div>
 
           <audio
             ref="audioRef"
             :src="audioUrl"
             preload="auto"
+            @error="handleAudioError"
             @timeupdate="handleTimeUpdate"
             @loadedmetadata="handleLoadedMetadata"
             @play="() => (isPlaying = true)"
@@ -122,6 +130,8 @@ const lyricMeta = reactive({ id: '', accesskey: '', fmt: '' })
 const lyricError = ref('')
 const audioUrl = ref('')
 const audioNotice = ref('')
+const audioLoadError = ref('')
+const audioLoadErrorUrl = ref('')
 const audioRef = ref(null)
 const lyricsScrollRef = ref(null)
 
@@ -208,6 +218,8 @@ watch(highlightedLineIndex, (index) => {
 watch(audioUrl, (url) => {
   if (url) {
     audioNotice.value = ''
+    audioLoadError.value = ''
+    audioLoadErrorUrl.value = ''
   } else {
     const audio = audioRef.value
     if (audio) {
@@ -217,6 +229,8 @@ watch(audioUrl, (url) => {
     isPlaying.value = false
     currentTime.value = 0
     duration.value = 0
+    audioLoadError.value = ''
+    audioLoadErrorUrl.value = ''
   }
 })
 
@@ -257,6 +271,8 @@ function resetData() {
   lyricError.value = ''
   audioUrl.value = ''
   audioNotice.value = ''
+  audioLoadError.value = ''
+  audioLoadErrorUrl.value = ''
   currentTime.value = 0
   duration.value = 0
 }
@@ -355,6 +371,19 @@ function togglePlayback() {
   } else {
     audio.pause()
   }
+}
+
+function handleAudioError(event) {
+  const url = audioUrl.value
+  if (!url) return
+
+  try {
+    event?.target?.pause?.()
+  } catch {}
+  isPlaying.value = false
+
+  audioLoadErrorUrl.value = url
+  audioLoadError.value = '音频资源加载失败：可能被浏览器拦截。请手动点击下面链接打开。'
 }
 
 function handleLoadedMetadata(event) {
@@ -812,6 +841,32 @@ function normalizeQuality(value) {
   margin: 0.2rem 0 0;
   font-size: 0.85rem;
   color: #fed7aa;
+}
+
+.audio-blocked {
+  margin-top: 0.2rem;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(254, 215, 170, 0.35);
+  background: rgba(254, 215, 170, 0.08);
+}
+
+.audio-blocked-title {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fed7aa;
+}
+
+.audio-blocked-url {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  word-break: break-all;
+  opacity: 0.9;
+}
+
+.audio-blocked-url a {
+  color: #8be8fd;
+  text-decoration: underline;
 }
 
 .lyrics-panel {
