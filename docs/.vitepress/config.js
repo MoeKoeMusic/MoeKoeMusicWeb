@@ -85,6 +85,8 @@ export default defineConfig({
           { text: '字体设置与自定义', link: '/guide/font-settings' },
           { text: '数据源说明', link: '/guide/data-source' },
           { text: '音频响度平衡', link: '/guide/volume-normalization' },
+          { text: '音频输出设备', link: '/guide/audio-output-device' },
+          { text: '输出设备变化自动暂停', link: '/guide/auto-pause-on-output-device-change' },
           { text: '歌词复制', link: '/guide/lyrics-copy' },
         ]
       },
