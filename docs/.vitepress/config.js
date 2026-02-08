@@ -102,7 +102,8 @@ export default defineConfig({
           { text: 'Windows 无法启动（Native stack trace）', link: '/faq/windows-startup-crash' },
           { text: 'Windows 7系统兼容性问题', link: '/faq/win7-compatibility' },
           { text: 'Ubuntu系统沙箱启动失败', link: '/faq/ubuntu-sandbox' },
-          { text: '麦克风权限问题', link: '/faq/microphone-permission' }
+          { text: '麦克风权限问题', link: '/faq/microphone-permission' },
+          { text: '解锁桌面歌词', link: '/faq/unlock-desktop-lrc' }
         ]
       }
     ],
