@@ -1,8 +1,133 @@
-﻿<template>
-  <div class="lyrics-share">
+<template>
+  <div class="lyrics-share" :class="`mode-${viewMode}`">
     <div class="visual-backdrop" :style="backdropStyle"></div>
     <div class="visual-overlay"></div>
-    <div class="player-shell">
+    <div class="visual-grain"></div>
+
+    <button type="button" class="mode-toggle" @click="toggleViewMode">
+      {{ viewMode === 'modern' ? '旧版界面' : '返回新版' }}
+    </button>
+
+    <section v-if="viewMode === 'modern'" class="modern-shell">
+      <div class="modern-hero">
+        <div class="modern-copy">
+          <p class="modern-kicker">MoeKoe Music Share</p>
+          <h1>{{ displaySong.title || '等待歌曲数据' }}</h1>
+          <p class="modern-artists">{{ artistLine }}</p>
+          <p class="modern-summary">{{ modernSummary }}</p>
+
+          <div class="modern-tags" v-if="modernTags.length">
+            <span v-for="tag in modernTags" :key="tag">{{ tag }}</span>
+          </div>
+
+          <div class="modern-facts">
+            <div>
+              <span>专辑</span>
+              <strong>{{ displaySong.album || '—' }}</strong>
+            </div>
+            <div>
+              <span>音质</span>
+              <strong>{{
+                displaySong.quality || (displaySong.bitrate ? `${displaySong.bitrate} kbps` : '—')
+              }}</strong>
+            </div>
+            <div>
+              <span>时长</span>
+              <strong>{{ formattedDuration }}</strong>
+            </div>
+          </div>
+
+          <div class="modern-actions">
+            <button
+              type="button"
+              class="modern-primary"
+              :class="{ disabled: !audioUrl }"
+              @click="togglePlayback"
+            >
+              <span v-if="isPlaying">暂停播放</span>
+              <span v-else>{{ audioUrl ? '立即播放' : '客户端播放' }}</span>
+            </button>
+            <a class="modern-secondary" href="/download" target="_blank" rel="noreferrer">
+              下载客户端
+            </a>
+          </div>
+
+          <div
+            class="modern-progress"
+            :class="{ muted: !audioUrl }"
+            @click="audioUrl ? seek($event) : null"
+          >
+            <div class="modern-progress-track">
+              <div class="modern-progress-fill" :style="{ width: `${progressPercent}%` }"></div>
+            </div>
+            <div class="modern-progress-time">
+              <span>{{ currentTimeDisplay }}</span>
+              <span>{{ totalTimeDisplay }}</span>
+            </div>
+          </div>
+
+          <p class="modern-notice" v-if="audioNotice">{{ audioNotice }}</p>
+
+          <div class="modern-error" v-if="audioLoadError && audioLoadErrorUrl">
+            <p>{{ audioLoadError }}</p>
+            <a :href="audioLoadErrorUrl" target="_blank" rel="noreferrer">{{ audioLoadErrorUrl }}</a>
+          </div>
+        </div>
+
+        <div class="modern-stage">
+          <div class="stage-top">
+            <div class="stage-cover">
+              <img v-if="displaySong.cover" :src="displaySong.cover" alt="cover" loading="lazy" />
+              <div v-else class="stage-cover-placeholder">MoeKoe</div>
+            </div>
+
+            <div class="stage-spotlight">
+              <span class="stage-label">Now Playing</span>
+              <strong>{{ currentLyricText || '等待歌词同步' }}</strong>
+              <p>{{ statusMessage }}</p>
+            </div>
+          </div>
+
+          <div class="stage-panel">
+            <div class="stage-panel-head">
+              <span>歌词流</span>
+              <span>{{ currentTimeDisplay }} / {{ totalTimeDisplay }}</span>
+            </div>
+
+            <div v-if="modernLyricWindow.length" class="stage-lyrics">
+              <p
+                v-for="line in modernLyricWindow"
+                :key="`${line.absoluteIndex}-${line.time}`"
+                :class="['stage-lyric', { active: line.absoluteIndex === highlightedLineIndex }]"
+              >
+                <span class="stage-lyric-time">{{ line.time || '···' }}</span>
+                <span class="stage-lyric-text">{{ line.text }}</span>
+              </p>
+            </div>
+
+            <div v-else class="stage-empty">
+              <p>{{ statusMessage }}</p>
+              <p v-if="fetchState.status === 'error' || lyricError" class="error-text">
+                {{ fetchState.error || lyricError }}
+              </p>
+            </div>
+          </div>
+
+          <div class="modern-footer">
+            <img class="modern-footer-logo" src="/ico.png" alt="MoeKoe" />
+            <div class="modern-footer-copy">
+              <p>下载 MoeKoe 客户端</p>
+              <span>完整播放、VIP 曲目与更多音质体验</span>
+            </div>
+            <a class="modern-footer-link" href="/download" target="_blank" rel="noreferrer">
+              立即下载
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-else class="player-shell">
       <div class="player-grid">
         <section class="player-side">
           <div class="cover-frame">
@@ -25,7 +150,9 @@
               </div>
               <div>
                 <strong>音质</strong>
-                <span>{{ displaySong.quality || (displaySong.bitrate ? `${displaySong.bitrate} kbps` : '—') }}</span>
+                <span>{{
+                  displaySong.quality || (displaySong.bitrate ? `${displaySong.bitrate} kbps` : '—')
+                }}</span>
               </div>
               <div>
                 <strong>时长</strong>
@@ -57,18 +184,6 @@
               </p>
             </div>
           </div>
-
-          <audio
-            ref="audioRef"
-            :src="audioUrl"
-            preload="auto"
-            @error="handleAudioError"
-            @timeupdate="handleTimeUpdate"
-            @loadedmetadata="handleLoadedMetadata"
-            @play="() => (isPlaying = true)"
-            @pause="() => (isPlaying = false)"
-            @ended="() => (isPlaying = false)"
-          ></audio>
         </section>
 
         <section class="lyrics-panel">
@@ -95,7 +210,20 @@
         <p class="footer-message">下载 MoeKoe 客户端即可收听完整版本与体验更多功能</p>
         <a class="footer-cta" href="/download" target="_blank" rel="noreferrer">立即下载</a>
       </div>
-    </div>
+    </section>
+
+    <audio
+      ref="audioRef"
+      class="shared-audio"
+      :src="audioUrl"
+      preload="auto"
+      @error="handleAudioError"
+      @timeupdate="handleTimeUpdate"
+      @loadedmetadata="handleLoadedMetadata"
+      @play="() => (isPlaying = true)"
+      @pause="() => (isPlaying = false)"
+      @ended="() => (isPlaying = false)"
+    ></audio>
   </div>
 </template>
 
@@ -134,6 +262,7 @@ const audioLoadError = ref('')
 const audioLoadErrorUrl = ref('')
 const audioRef = ref(null)
 const lyricsScrollRef = ref(null)
+const viewMode = ref('modern')
 
 const fetchState = reactive({
   status: 'idle',
@@ -163,6 +292,11 @@ const heroTags = computed(() => {
   return dedup
 })
 
+const modernTags = computed(() => heroTags.value.slice(0, 3))
+const artistLine = computed(() =>
+  displaySong.value.artists.length ? displaySong.value.artists.join(' · ') : 'MoeKoe Music'
+)
+
 const formattedDuration = computed(() =>
   displaySong.value.duration ? formatTimecode(displaySong.value.duration / 1000) : '00:00'
 )
@@ -191,6 +325,12 @@ const highlightedLineIndex = computed(() => {
   return candidate >= 0 ? candidate : 0
 })
 
+const activeLyricLine = computed(() => {
+  if (!lyricLines.value.length) return null
+  return lyricLines.value[highlightedLineIndex.value] || lyricLines.value[0] || null
+})
+
+const currentLyricText = computed(() => activeLyricLine.value?.text || '')
 const statusMessage = computed(() => {
   if (!queryModel.hash) return '在分享链接中追加 ?hash=xxx 即可自动获取数据'
   if (fetchState.status === 'loading') return '正在同步歌曲信息与歌词...'
@@ -199,10 +339,24 @@ const statusMessage = computed(() => {
     if (lyricError.value) {
       return `歌词加载失败 · ${playback}`
     }
-    return `已获取 ${lyricLines.value.length} 行歌词 · ${playback}`
+    return ``
   }
   if (fetchState.status === 'error') return `解析失败：${fetchState.error}`
   return '等待解析歌词'
+})
+const modernSummary = computed(
+  () => currentLyricText.value || displaySong.value.description || statusMessage.value
+)
+
+const modernLyricWindow = computed(() => {
+  if (!lyricLines.value.length) return []
+  const pivot = Math.max(0, highlightedLineIndex.value)
+  const start = Math.max(0, pivot - 1)
+  const end = Math.min(lyricLines.value.length, start + 5)
+  return lyricLines.value.slice(start, end).map((line, index) => ({
+    ...line,
+    absoluteIndex: start + index
+  }))
 })
 
 watch(highlightedLineIndex, (index) => {
@@ -275,6 +429,10 @@ function resetData() {
   audioLoadErrorUrl.value = ''
   currentTime.value = 0
   duration.value = 0
+}
+
+function toggleViewMode() {
+  viewMode.value = viewMode.value === 'modern' ? 'legacy' : 'modern'
 }
 
 function attemptOpenMoekoeScheme() {
@@ -649,27 +807,460 @@ function normalizeQuality(value) {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  color: #fff;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft Yahei', sans-serif;
+  background: #060914;
+  color: #f7f1e6;
+  font-family: 'Avenir Next', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.shared-audio {
+  display: none;
 }
 
 .visual-backdrop {
   position: fixed;
   inset: 0;
+  background-color: #101728;
   background-size: cover;
   background-position: center;
-  filter: blur(80px);
-  transform: scale(1.2);
-  z-index: -2;
+  filter: blur(16px) saturate(1.15);
+  transform: scale(1.12);
+  z-index: -3;
   pointer-events: none;
 }
 
 .visual-overlay {
   position: fixed;
   inset: 0;
-  background: linear-gradient(145deg, rgba(12, 16, 39, 0.95), rgba(14, 25, 60, 0.7));
+  background:
+    radial-gradient(circle at 20% 20%, rgba(231, 200, 150, 0.22), transparent 30%),
+    radial-gradient(circle at 80% 18%, rgba(101, 129, 255, 0.16), transparent 26%),
+    linear-gradient(135deg, rgba(4, 10, 24, 0.9), rgba(7, 13, 27, 0.72) 48%, rgba(5, 7, 15, 0.92));
+  z-index: -2;
+  pointer-events: none;
+}
+
+.visual-grain {
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.035), transparent 35%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 0,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 80px
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
   z-index: -1;
   pointer-events: none;
+}
+
+.mode-toggle {
+  position: fixed;
+  top: calc(1.25rem + env(safe-area-inset-top, 0px));
+  right: max(1.25rem, env(safe-area-inset-right, 0px));
+  z-index: 30;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.8rem 1.15rem;
+  background: rgba(12, 18, 34, 0.68);
+  color: #f8f2e8;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  font-size: 0.92rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.mode-toggle:hover {
+  transform: translateY(-2px);
+  border-color: rgba(231, 200, 150, 0.45);
+  background: rgba(17, 24, 42, 0.82);
+}
+
+.modern-shell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  box-sizing: border-box;
+}
+
+.modern-hero {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+}
+
+.modern-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1rem, 2vw, 2rem) 0;
+}
+
+.modern-kicker {
+  margin: 0;
+  color: rgba(247, 241, 230, 0.72);
+  font-size: 0.84rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.modern-copy h1 {
+  margin: 0;
+  font-size: clamp(3rem, 7vw, 6.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-family: 'Georgia', 'Times New Roman', 'Source Han Serif SC', serif;
+  text-wrap: balance;
+  max-width: 10ch;
+}
+
+.modern-artists {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: rgba(247, 241, 230, 0.76);
+}
+
+.modern-summary {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(1rem, 1.7vw, 1.22rem);
+  line-height: 1.8;
+  color: rgba(247, 241, 230, 0.9);
+}
+
+.modern-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.modern-tags span {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 248, 239, 0.86);
+  font-size: 0.88rem;
+}
+
+.modern-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.modern-facts div {
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.modern-facts span {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.76rem;
+  color: rgba(247, 241, 230, 0.58);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modern-facts strong {
+  display: block;
+  font-size: 1rem;
+  color: #fff7ed;
+  word-break: break-word;
+}
+
+.modern-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.65rem;
+}
+
+.modern-primary,
+.modern-secondary,
+.modern-footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 999px;
+  padding: 0 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.modern-primary {
+  border: none;
+  background: linear-gradient(135deg, #f2dfc2, #d8b381);
+  color: #1b1520;
+  font-weight: 700;
+  box-shadow: 0 20px 36px rgba(216, 179, 129, 0.28);
+}
+
+.modern-primary.disabled {
+  box-shadow: none;
+}
+
+.modern-secondary,
+.modern-footer-link {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f7f1e6;
+  backdrop-filter: blur(18px);
+}
+
+.modern-primary:hover,
+.modern-secondary:hover,
+.modern-footer-link:hover {
+  transform: translateY(-2px);
+}
+
+.modern-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 34rem;
+  padding: 1rem 1.1rem;
+  border-radius: 24px;
+  background: rgba(6, 12, 26, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(24px);
+}
+
+.modern-progress.muted {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.modern-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+  overflow: hidden;
+}
+
+.modern-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f2dfc2, #d8b381);
+}
+
+.modern-progress-time {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(247, 241, 230, 0.66);
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+.modern-notice {
+  margin: 0;
+  color: #f8d6a2;
+  font-size: 0.9rem;
+}
+
+.modern-error {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 34rem;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(87, 31, 31, 0.22);
+  border: 1px solid rgba(248, 214, 162, 0.24);
+}
+
+.modern-error p,
+.modern-error a {
+  margin: 0;
+  color: #ffe7c8;
+  word-break: break-all;
+}
+
+.modern-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stage-top,
+.stage-panel,
+.modern-footer {
+  position: relative;
+  border-radius: 32px;
+  background: rgba(8, 14, 30, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(28px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
+}
+
+.stage-top {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 1.1rem;
+  padding: 1.1rem;
+}
+
+.stage-cover {
+  aspect-ratio: 1 / 1;
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stage-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stage-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(247, 241, 230, 0.7);
+}
+
+.stage-spotlight {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.35rem;
+}
+
+.stage-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 241, 230, 0.52);
+}
+
+.stage-spotlight strong {
+  font-size: clamp(1.4rem, 2.8vw, 2.4rem);
+  line-height: 1.2;
+  color: #fff8ef;
+  font-family: 'Georgia', 'Times New Roman', 'Source Han Serif SC', serif;
+}
+
+.stage-spotlight p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(247, 241, 230, 0.72);
+}
+
+.stage-panel {
+  padding: 1.2rem;
+}
+
+.stage-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  color: rgba(247, 241, 230, 0.58);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-lyrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.stage-lyric {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0.95rem 1rem;
+  border-radius: 20px;
+  color: rgba(247, 241, 230, 0.6);
+  background: rgba(255, 255, 255, 0.03);
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.stage-lyric.active {
+  transform: translateX(6px);
+  background: linear-gradient(135deg, rgba(242, 223, 194, 0.22), rgba(216, 179, 129, 0.12));
+  color: #fff7ed;
+}
+
+.stage-lyric-time {
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  color: rgba(247, 241, 230, 0.45);
+}
+
+.stage-lyric-text {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.stage-empty {
+  padding: 2.2rem 0.4rem;
+  text-align: center;
+  color: rgba(247, 241, 230, 0.72);
+}
+
+.error-text {
+  color: #ffccab;
+}
+
+.modern-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.modern-footer-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+}
+
+.modern-footer-copy {
+  flex: 1;
+}
+
+.modern-footer-copy p,
+.modern-footer-copy span {
+  display: block;
+}
+
+.modern-footer-copy p {
+  margin: 0 0 0.3rem;
+  color: #fff8ef;
+}
+
+.modern-footer-copy span {
+  color: rgba(247, 241, 230, 0.62);
+  font-size: 0.88rem;
 }
 
 .player-shell {
@@ -678,7 +1269,7 @@ function normalizeQuality(value) {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(5rem, 7vw, 6.25rem) clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -978,12 +1569,6 @@ function normalizeQuality(value) {
   font-weight: 600;
 }
 
-@media (max-width: 1100px) {
-  .player-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @keyframes footer-slide-in {
   0% {
     transform: translate(-50%, 130%);
@@ -999,9 +1584,67 @@ function normalizeQuality(value) {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1180px) {
+  .modern-hero {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .modern-copy h1 {
+    max-width: none;
+  }
+
+  .modern-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .player-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .mode-toggle {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.72rem 1rem;
+    font-size: 0.84rem;
+  }
+
+  .modern-shell {
+    padding: 5rem 1rem 1.25rem;
+  }
+
+  .modern-copy {
+    gap: 0.85rem;
+  }
+
+  .modern-copy h1 {
+    font-size: clamp(2.4rem, 16vw, 4.1rem);
+  }
+
+  .modern-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-top {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-cover {
+    max-width: 280px;
+  }
+
+  .modern-footer {
+    flex-wrap: wrap;
+  }
+
+  .modern-footer-link {
+    width: 100%;
+  }
+
   .player-shell {
-    padding: 1.5rem;
+    padding: 4.75rem 1rem 1.5rem;
   }
 
   .player-side {
@@ -1010,6 +1653,36 @@ function normalizeQuality(value) {
 
   .lyrics-panel {
     padding: 1.2rem;
+  }
+
+  .lyrics-panel-inner {
+    padding: 0.75rem 0.4rem;
+  }
+
+  .player-footer {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    transform: translateY(130%);
+    width: auto;
+    border-radius: 28px;
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+
+  @keyframes footer-slide-in {
+    0% {
+      transform: translateY(130%);
+      opacity: 0;
+    }
+    70% {
+      transform: translateY(-4%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 }
 </style>
