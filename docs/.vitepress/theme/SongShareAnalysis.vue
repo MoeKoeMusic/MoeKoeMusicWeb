@@ -114,7 +114,7 @@
           </div>
 
           <div class="modern-footer">
-            <img class="modern-footer-logo" src="/ico.png" alt="MoeKoe" />
+            <img class="modern-footer-logo" src="/hero.png" alt="MoeKoe" />
             <div class="modern-footer-copy">
               <p>下载 MoeKoe 客户端</p>
               <span>完整播放、VIP 曲目与更多音质体验</span>
@@ -206,7 +206,7 @@
       </div>
 
       <div class="player-footer" :class="fetchState.status">
-        <img class="footer-logo" src="/ico.png" alt="MoeKoe" />
+        <img class="footer-logo" src="/hero.png" alt="MoeKoe" />
         <p class="footer-message">下载 MoeKoe 客户端即可收听完整版本与体验更多功能</p>
         <a class="footer-cta" href="/download" target="_blank" rel="noreferrer">立即下载</a>
       </div>

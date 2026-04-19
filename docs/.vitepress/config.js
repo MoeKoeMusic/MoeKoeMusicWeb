@@ -32,7 +32,7 @@ export default defineConfig({
     }
   },
   head: [
-    ['link', { rel: 'icon', href: '/ico.png' }],
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
     ['title', {}, 'MoeKoe Music - 现代化的酷狗第三方客户端']
   ],
   themeConfig: {

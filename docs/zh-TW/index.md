@@ -5,7 +5,7 @@ hero:
   text: "現代化的酷狗第三方客戶端"
   tagline: 開源、簡潔、高顏值的跨平台音樂播放器
   image:
-    src: /ico.png
+    src: /hero.png
     alt: MoeKoe Music
   actions:
     - theme: brand

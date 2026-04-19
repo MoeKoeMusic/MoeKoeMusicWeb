@@ -5,7 +5,7 @@ hero:
   text: "モダンなKugouサードパーティクライアント"
   tagline: オープンソース、シンプル、美しいクロスプラットフォーム音楽プレーヤー
   image:
-    src: /ico.png
+    src: /hero.png
     alt: MoeKoe Music
   actions:
     - theme: brand
