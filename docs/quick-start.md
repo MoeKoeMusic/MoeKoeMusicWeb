@@ -1,5 +1,9 @@
 # 快速开始
 
+<a href="https://github.com/orgs/MoeKoeMusic/discussions/940" target="_blank" style="float: right; margin: 0 0 10px 10px; margin-top: -70px;">
+<img src="./public/banner.png" alt="MoeKoe Music Banner" width="200" />
+</a>
+
 ## 什么是 MoeKoe Music?
 
 MoeKoe Music 是一款现代化的酷狗第三方客户端，它是一个开源、简洁、高颜值的跨平台音乐播放器，支持Hi-Fi品质音频播放。

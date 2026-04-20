@@ -10,8 +10,6 @@ MoeKoe Music 基于[MakcRe/KuGouMusicApi](https://github.com/MakcRe/KuGouMusicAp
 
 [**酷狗音乐 API 文档**](https://kugoumusicapi-docs.4everland.app)
 
-> https://kugoumusicapi-docs.4everland.app
-
 该文档详细说明了：
 
 - API 端点列表
