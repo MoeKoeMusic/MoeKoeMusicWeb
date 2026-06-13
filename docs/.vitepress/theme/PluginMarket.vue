@@ -279,7 +279,8 @@ const normalizeMarketPlugin = (item, index) => {
     permissions: {
       networkAccess: item.networkAccess === true,
       fileAccess: item.fileAccess === true,
-      binaryContent: item.binaryContent === true
+      binaryContent: item.binaryContent === true,
+      storageAccess: item.storageAccess === true
     }
   }
 }
@@ -320,6 +321,11 @@ const resolveMarketPermissions = plugin => {
       key: 'binaryContent',
       label: '含二进制',
       enabled: permissions.binaryContent === true
+    },
+    {
+      key: 'storageAccess',
+      label: '存储权限',
+      enabled: permissions.storageAccess === true
     }
   ].filter(permission => permission.enabled)
 }
