@@ -110,7 +110,7 @@
           <a
             class="market-button success"
             :class="{ disabled: !plugin.downloadUrl }"
-            :href="resolvePluginDownloadUrl(plugin) || undefined"
+            :href="plugin.downloadUrl || undefined"
             target="_blank"
             rel="noopener noreferrer"
             :aria-disabled="!plugin.downloadUrl"
@@ -301,61 +301,6 @@ const normalizeUrl = value => {
   return trimmed
 }
 
-const resolvePluginDownloadUrl = plugin => {
-  const normalized = normalizeUrl(plugin?.downloadUrl)
-  if (!normalized) {
-    return ''
-  }
-
-  if (/\.zip($|\?)/i.test(normalized)) {
-    return normalized
-  }
-
-  try {
-    const url = new URL(normalized)
-    if (url.hostname !== 'github.com') {
-      return normalized
-    }
-
-    const segments = url.pathname.split('/').filter(Boolean)
-    if (segments.length < 2) {
-      return normalized
-    }
-
-    const [owner, repo, type, ...rest] = segments
-    const ref = rest.join('/')
-    const fallbackBranch = plugin?.branch || 'main'
-    const archiveRef = value => {
-      const resolvedRef = String(value || '').trim()
-      if (!resolvedRef) {
-        return ''
-      }
-
-      if (/^[0-9a-f]{7,40}$/i.test(resolvedRef)) {
-        return `https://github.com/${owner}/${repo}/archive/${resolvedRef}.zip`
-      }
-
-      return `https://github.com/${owner}/${repo}/archive/refs/heads/${encodeURIComponent(resolvedRef)}.zip`
-    }
-
-    if (!type) {
-      return archiveRef(plugin?.commitSha || fallbackBranch) || normalized
-    }
-
-    if (type === 'tree') {
-      return archiveRef(ref) || normalized
-    }
-
-    if (type === 'blob') {
-      const rawUrl = normalized.replace('https://github.com/', 'https://raw.githubusercontent.com/').replace('/blob/', '/')
-      return /\.zip($|\?)/i.test(rawUrl) ? rawUrl : normalized
-    }
-  } catch (error) {
-    console.error('Failed to resolve plugin download url:', error)
-  }
-
-  return normalized
-}
 
 const resolveMarketPermissions = plugin => {
   const permissions = plugin?.permissions || {}
