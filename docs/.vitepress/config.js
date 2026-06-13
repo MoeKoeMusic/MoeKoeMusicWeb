@@ -52,6 +52,7 @@ export default defineConfig({
     nav: [
       { text: '快速开始', link: '/quick-start' },
       { text: '下载', link: '/download' },
+      { text: '插件市场', link: '/plugins' },
       { text: '关于', link: '/about' },
       { text: 'API', link: '/api-docs' },
       { text: 'GitHub', link: 'https://github.com/iAJue/MoeKoeMusic' }
