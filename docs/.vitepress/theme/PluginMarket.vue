@@ -456,7 +456,6 @@ onMounted(() => {
   flex: 0 0 52px;
   overflow: hidden;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2563eb, #14b8a6);
   color: white;
   font-weight: 800;
   font-size: 22px;
