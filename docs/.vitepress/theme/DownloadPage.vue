@@ -35,13 +35,20 @@
       <div class="platform-group" v-if="groupedAssets.windows.length">
         <div class="platform-header">
           <div class="platform-icon-large">💻</div>
-          <h3 class="platform-title">Windows</h3>
+          <div>
+            <h3 class="platform-title">Windows</h3>
+            <span class="platform-count">{{ groupedAssets.windows.length }} 个文件</span>
+          </div>
         </div>
         <div class="platform-downloads">
           <div v-for="asset in groupedAssets.windows" :key="asset?.id" class="download-item">
             <div class="download-item-content">
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset.desc }}</div>
+                <div class="download-file-name" :title="asset.fileName">
+                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-text">{{ asset.fileName }}</span>
+                </div>
               </div>
               <div class="download-item-footer">
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
@@ -58,13 +65,20 @@
       <div class="platform-group" v-if="groupedAssets.mac.length">
         <div class="platform-header">
           <div class="platform-icon-large">🍎</div>
-          <h3 class="platform-title">macOS</h3>
+          <div>
+            <h3 class="platform-title">macOS</h3>
+            <span class="platform-count">{{ groupedAssets.mac.length }} 个文件</span>
+          </div>
         </div>
         <div class="platform-downloads">
           <div v-for="asset in groupedAssets.mac" :key="asset?.id" class="download-item">
             <div class="download-item-content">
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset?.desc }}</div>
+                <div class="download-file-name" :title="asset.fileName">
+                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-text">{{ asset.fileName }}</span>
+                </div>
               </div>
               <div class="download-item-footer">
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
@@ -81,13 +95,20 @@
       <div class="platform-group" v-if="groupedAssets.linux.length">
         <div class="platform-header">
           <div class="platform-icon-large">🐧</div>
-          <h3 class="platform-title">Linux</h3>
+          <div>
+            <h3 class="platform-title">Linux</h3>
+            <span class="platform-count">{{ groupedAssets.linux.length }} 个文件</span>
+          </div>
         </div>
         <div class="platform-downloads">
           <div v-for="asset in groupedAssets.linux" :key="asset?.id" class="download-item">
             <div class="download-item-content">
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset.desc }}</div>
+                <div class="download-file-name" :title="asset.fileName">
+                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-text">{{ asset.fileName }}</span>
+                </div>
               </div>
               <div class="download-item-footer">
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
@@ -132,9 +153,9 @@ const groupedAssets = computed(() => {
     .filter(a => a.size > 10 * 1024 * 1024)
     .reduce((acc, asset) => {
       const info = getSystemInfo(asset.name)
-      if (info.name.includes('Windows')) acc.windows.push({ ...asset, ...info })
-      else if (info.name.includes('macOS')) acc.mac.push({ ...asset, ...info })
-      else if (info.name.includes('Linux')) acc.linux.push({ ...asset, ...info })
+      if (info.name.includes('Windows')) acc.windows.push({ ...asset, fileName: asset.name, ...info })
+      else if (info.name.includes('macOS')) acc.mac.push({ ...asset, fileName: asset.name, ...info })
+      else if (info.name.includes('Linux')) acc.linux.push({ ...asset, fileName: asset.name, ...info })
       return acc
     }, { windows: [], mac: [], linux: [] })
 })
@@ -441,106 +462,188 @@ const formatSize = bytes => {
 }
 
 .download-options {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  display: grid;
+  gap: 1.25rem;
   animation: slideUp 0.6s ease-out;
 }
 
 .platform-group {
-  display: flex;
-  gap: 2rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 20px;
-  padding: 2rem;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 1.25rem;
   border: 1px solid var(--vp-c-divider);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  border-radius: 16px;
+  padding: 1.25rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--vp-c-bg-soft) 78%, transparent), var(--vp-c-bg)),
+    var(--vp-c-bg);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.platform-group:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--vp-c-brand) 35%, var(--vp-c-divider));
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.07);
 }
 
 .platform-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding-right: 2rem;
-  border-right: 1px solid var(--vp-c-divider);
+  align-self: start;
+  gap: 0.9rem;
+  min-height: 64px;
+  padding: 0.75rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: var(--vp-c-bg-soft);
 }
 
 .platform-icon-large {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  animation: float 3s ease-in-out infinite;
-  margin-top: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--vp-c-bg);
+  box-shadow: inset 0 0 0 1px var(--vp-c-divider);
+  font-size: 1.6rem;
+  flex: 0 0 auto;
 }
 
 .platform-title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--vp-c-text-1);
   margin: 0;
+  color: var(--vp-c-text-1);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.platform-count {
+  display: inline-flex;
+  margin-top: 0.25rem;
+  color: var(--vp-c-text-3);
+  font-size: 0.82rem;
+  line-height: 1.2;
 }
 
 .platform-downloads {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.download-item {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: var(--vp-c-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.download-item:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand) 32%, var(--vp-c-divider));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
 }
 
 .download-item-content {
-  padding: 1.5rem;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
+  padding: 1rem;
 }
 
 .download-item-header {
-  margin-bottom: 0;
-  flex: 1;
+  min-width: 0;
 }
 
 .download-item-desc {
+  margin: 0;
   color: var(--vp-c-text-1);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.download-file-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  color: var(--vp-c-text-2);
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.download-file-label {
+  flex: 0 0 auto;
+  border-radius: 6px;
+  padding: 0 0.35rem;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-family: var(--vp-font-family-base);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+}
+
+.download-file-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.download-item:hover .download-file-name,
+.download-item:hover .download-file-label {
+  color: var(--vp-c-text-1);
 }
 
 .download-item-footer {
-  margin-top: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-  min-width: 120px;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 0 0 auto;
 }
 
 .download-info {
-  font-size: 0.95rem;
+  min-width: 74px;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-2);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .download-button {
-  display: inline-flex!important;
-  align-items: center!important;
-  justify-content: center!important;
-  background: linear-gradient(120deg, var(--vp-c-brand-light) 0%, var(--vp-c-brand) 100%)!important;
-  color: white!important;
-  padding: 0.8rem 1.5rem!important;
-  border-radius: 12px!important;
-  text-decoration: none!important;
-  font-weight: 600!important;
-  transition: all 0.3s ease!important;
-  box-shadow: 0 4px 15px rgba(102, 166, 255, 0.2)!important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  background: #3f5bd8;
+  color: white;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 8px 18px rgba(63, 91, 216, 0.28);
+}
+
+.download-button,
+.download-button:hover,
+.download-button span {
+  color: #fff;
 }
 
 .download-button:hover {
-  transform: translateY(-2px)!important;
-  box-shadow: 0 8px 20px rgba(102, 166, 255, 0.4)!important;
+  transform: translateY(-1px);
+  background: #3349bd;
+  box-shadow: 0 12px 24px rgba(63, 91, 216, 0.36);
 }
 
 .download-icon {
@@ -598,15 +701,11 @@ const formatSize = bytes => {
 
 @media (max-width: 768px) {
   .platform-group {
-    flex-direction: column;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
 
   .platform-header {
-    padding-right: 0;
-    padding-bottom: 1.5rem;
-    border-right: none;
-    border-bottom: 1px solid var(--vp-c-divider);
+    min-height: auto;
   }
 
   .download-header {
@@ -631,161 +730,23 @@ const formatSize = bytes => {
     font-size: 0.8rem;
   }
 
-  .platform-icon-large {
-    font-size: 2rem;
-  }
-
   .platform-title {
-    font-size: 1.5rem;
+    font-size: 1.05rem;
   }
 }
 
 @media (max-width: 640px) {
   .download-item-content {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .download-item-footer {
-    align-items: stretch;
-    margin-top: 1rem;
+    justify-content: space-between;
   }
 
-  .download-info {
-    text-align: center;
-  }
-}
-
-:deep(.platform-group) {
-  display: flex !important;
-  gap: 2rem !important;
-  background: var(--vp-c-bg-soft) !important;
-  border-radius: 20px !important;
-  padding: 2rem !important;
-  border: 1px solid var(--vp-c-divider) !important;
-  transition: all 0.3s ease !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-:deep(.platform-header) {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  min-width: 200px !important;
-  padding-right: 2rem !important;
-  border-right: 1px solid var(--vp-c-divider) !important;
-}
-
-:deep(.platform-icon-large) {
-  font-size: 3.5rem !important;
-  margin-bottom: 1rem !important;
-  animation: float 3s ease-in-out infinite !important;
-}
-
-:deep(.platform-title) {
-  font-size: 1.8rem !important;
-  font-weight: 600 !important;
-  color: var(--vp-c-text-1) !important;
-  margin: 0 !important;
-}
-
-:deep(.platform-downloads) {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 1.5rem !important;
-}
-
-:deep(.download-item) {
-  width: 100% !important;
-  background: var(--vp-c-bg) !important;
-  border-radius: 16px !important;
-  overflow: hidden !important;
-  transition: all 0.3s ease !important;
-  border: 1px solid var(--vp-c-divider) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
-}
-
-:deep(.download-item-content) {
-  padding: 1.5rem !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  gap: 1rem !important;
-}
-
-:deep(.download-item-header) {
-  margin-bottom: 0 !important;
-  flex: 1 !important;
-}
-
-:deep(.download-item-desc) {
-  color: var(--vp-c-text-1) !important;
-  font-size: 1rem !important;
-  font-weight: 500 !important;
-}
-
-:deep(.download-item-footer) {
-  margin-top: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  gap: 0.5rem !important;
-  min-width: 120px !important;
-}
-
-:deep(.download-info) {
-  font-size: 0.95rem !important;
-  color: var(--vp-c-text-2) !important;
-}
-
-:deep(.download-button) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: linear-gradient(120deg, var(--vp-c-brand-light) 0%, var(--vp-c-brand) 100%) !important;
-  color: white !important;
-  padding: 0.8rem 1.5rem !important;
-  border-radius: 12px !important;
-  text-decoration: none !important;
-  font-weight: 600 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 15px rgba(102, 166, 255, 0.2) !important;
-}
-
-:deep(.download-button:hover) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(102, 166, 255, 0.4) !important;
-}
-
-@media (max-width: 768px) {
-  :deep(.platform-group) {
-    flex-direction: column !important;
-    gap: 1.5rem !important;
-  }
-
-  :deep(.platform-header) {
-    padding-right: 0 !important;
-    padding-bottom: 1.5rem !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--vp-c-divider) !important;
+  .download-button {
+    min-width: 112px;
   }
 }
 
-@media (max-width: 640px) {
-  :deep(.download-item-content) {
-    flex-direction: column !important;
-    align-items: stretch !important;
-  }
-
-  :deep(.download-item-footer) {
-    align-items: stretch !important;
-    margin-top: 1rem !important;
-  }
-
-  :deep(.download-info) {
-    text-align: center !important;
-  }
-}
 </style>
