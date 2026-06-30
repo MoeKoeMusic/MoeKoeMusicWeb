@@ -65,6 +65,8 @@ export default defineConfig({
           { text: '快速开始', link: '/quick-start' },
           { text: '安装说明', link: '/installation' },
           { text: '开发部署', link: '/development'},
+          { text: '插件开发 [基础]', link: '/guide/basic-plugin-development' },
+          { text: '插件开发 [进阶]', link: '/guide/advanced-plugin-development' },
           { text: 'WebSocket API', link: '/websocket-api' },
           { text: 'Web API', link: '/api-docs' },
           { text: '许可证', link: 'https://github.com/iAJue/MoeKoeMusic?tab=GPL-2.0-1-ov-file#readme' },
