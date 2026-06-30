@@ -1,24 +1,24 @@
 <template>
   <div v-if="loading" class="loading">
     <div class="loading-spinner"></div>
-    <div class="loading-text">正在获取最新版本信息...</div>
+    <div class="loading-text">{{ t.loading }}</div>
   </div>
 
   <div v-else-if="error" class="error">
     <div class="error-icon">⚠</div>
     <div class="error-message">{{ error }}</div>
-    <button @click="fetchReleaseInfo" class="retry-button">重试</button>
+    <button @click="fetchReleaseInfo" class="retry-button">{{ t.retry }}</button>
   </div>
 
   <div v-else class="download-section">
     <div class="download-header">
       <div class="version-info">
-        <div class="version-badge">最新版本</div>
+        <div class="version-badge">{{ t.latestVersion }}</div>
         <h2 class="version-number">{{ releases.tag_name }}</h2>
-        <p class="release-date">发布于 {{ formatDate(releases.published_at) }}</p>
+        <p class="release-date">{{ t.releasedOn }} {{ formatDate(releases.published_at) }}</p>
         <div class="release-notes" v-if="releases.body">
           <details>
-            <summary>更新说明</summary>
+            <summary>{{ t.releaseNotes }}</summary>
             <ReleaseNotesMarkdown :body="releases.body" />
           </details>
         </div>
@@ -26,7 +26,7 @@
       <div class="region-selector">
         <label class="checkbox-label">
           <input type="checkbox" v-model="useProxy">
-          <span>我是来自中国大陆 <span class="region-hint"> (使用镜像加速下载)</span></span>
+          <span>{{ t.proxyText }} <span class="region-hint">{{ t.proxyHint }}</span></span>
         </label>
       </div>
     </div>
@@ -37,7 +37,7 @@
           <div class="platform-icon-large">💻</div>
           <div>
             <h3 class="platform-title">Windows</h3>
-            <span class="platform-count">{{ groupedAssets.windows.length }} 个文件</span>
+            <span class="platform-count">{{ formatFileCount(groupedAssets.windows.length) }}</span>
           </div>
         </div>
         <div class="platform-downloads">
@@ -46,7 +46,7 @@
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset.desc }}</div>
                 <div class="download-file-name" :title="asset.fileName">
-                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-label">{{ t.fileName }}</span>
                   <span class="download-file-text">{{ asset.fileName }}</span>
                 </div>
               </div>
@@ -54,7 +54,7 @@
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
                 <a :href="useProxy ? `https://gh-proxy.com/${asset.browser_download_url}` : asset.browser_download_url" class="download-button" target="_blank">
                   <span class="download-icon" aria-hidden="true"></span>
-                  <span>下载</span>
+                  <span>{{ t.download }}</span>
                 </a>
               </div>
             </div>
@@ -67,7 +67,7 @@
           <div class="platform-icon-large">🍎</div>
           <div>
             <h3 class="platform-title">macOS</h3>
-            <span class="platform-count">{{ groupedAssets.mac.length }} 个文件</span>
+            <span class="platform-count">{{ formatFileCount(groupedAssets.mac.length) }}</span>
           </div>
         </div>
         <div class="platform-downloads">
@@ -76,7 +76,7 @@
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset?.desc }}</div>
                 <div class="download-file-name" :title="asset.fileName">
-                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-label">{{ t.fileName }}</span>
                   <span class="download-file-text">{{ asset.fileName }}</span>
                 </div>
               </div>
@@ -84,7 +84,7 @@
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
                 <a :href="useProxy ? `https://gh-proxy.com/${asset.browser_download_url}` : asset.browser_download_url" class="download-button" target="_blank">
                   <span class="download-icon" aria-hidden="true"></span>
-                  <span>下载</span>
+                  <span>{{ t.download }}</span>
                 </a>
               </div>
             </div>
@@ -97,7 +97,7 @@
           <div class="platform-icon-large">🐧</div>
           <div>
             <h3 class="platform-title">Linux</h3>
-            <span class="platform-count">{{ groupedAssets.linux.length }} 个文件</span>
+            <span class="platform-count">{{ formatFileCount(groupedAssets.linux.length) }}</span>
           </div>
         </div>
         <div class="platform-downloads">
@@ -106,7 +106,7 @@
               <div class="download-item-header">
                 <div class="download-item-desc">{{ asset.desc }}</div>
                 <div class="download-file-name" :title="asset.fileName">
-                  <span class="download-file-label">文件名</span>
+                  <span class="download-file-label">{{ t.fileName }}</span>
                   <span class="download-file-text">{{ asset.fileName }}</span>
                 </div>
               </div>
@@ -114,7 +114,7 @@
                 <div class="download-info">{{ formatSize(asset.size) }} MB</div>
                 <a :href="useProxy ? `https://gh-proxy.com/${asset.browser_download_url}` : asset.browser_download_url" class="download-button" target="_blank">
                   <span class="download-icon" aria-hidden="true"></span>
-                  <span>下载</span>
+                  <span>{{ t.download }}</span>
                 </a>
               </div>
             </div>
@@ -124,7 +124,7 @@
 
       <div class="no-downloads" v-if="!groupedAssets.windows.length && !groupedAssets.mac.length && !groupedAssets.linux.length">
         <div class="no-downloads-icon">📦</div>
-        <div class="no-downloads-text">暂无可用下载</div>
+        <div class="no-downloads-text">{{ t.noDownloads }}</div>
       </div>
     </div>
   </div>
@@ -134,18 +134,130 @@
 import { computed, onMounted, ref } from 'vue'
 import ReleaseNotesMarkdown from './ReleaseNotesMarkdown.vue'
 
+const props = defineProps({
+  locale: {
+    type: String,
+    default: 'zh-CN'
+  }
+})
+
+const messages = {
+  'zh-CN': {
+    dateLocale: 'zh-CN',
+    loading: '正在获取最新版本信息...',
+    retry: '重试',
+    latestVersion: '最新版本',
+    releasedOn: '发布于',
+    releaseNotes: '更新说明',
+    proxyText: '我是来自中国大陆',
+    proxyHint: ' (使用镜像加速下载)',
+    fileName: '文件名',
+    download: '下载',
+    noDownloads: '暂无可用下载',
+    requestFailed: status => `获取失败: ${status}`,
+    timeout: '请求超时，请稍后再试',
+    fetchFailed: '获取版本信息失败，请稍后再试',
+    fileCount: count => `${count} 个文件`,
+    assets: {
+      windowsInstaller: 'Windows 安装程序',
+      linuxAppImage: 'Linux AppImage 可执行文件',
+      deb: 'Debian/Ubuntu 安装包',
+      macDmg: 'macOS 安装镜像',
+      macZip: 'macOS 压缩包',
+      other: '其他格式'
+    }
+  },
+  en: {
+    dateLocale: 'en-US',
+    loading: 'Fetching latest version information...',
+    retry: 'Retry',
+    latestVersion: 'Latest Version',
+    releasedOn: 'Released on',
+    releaseNotes: 'Release Notes',
+    proxyText: "I'm from Mainland China",
+    proxyHint: ' (Use mirror for faster download)',
+    fileName: 'File',
+    download: 'Download',
+    noDownloads: 'No downloads available',
+    requestFailed: status => `Request failed: ${status}`,
+    timeout: 'Request timeout, please try again later',
+    fetchFailed: 'Failed to fetch version information, please try again later',
+    fileCount: count => `${count} file${count === 1 ? '' : 's'}`,
+    assets: {
+      windowsInstaller: 'Windows Installer',
+      linuxAppImage: 'Linux AppImage Executable',
+      deb: 'Debian/Ubuntu Package',
+      macDmg: 'macOS Disk Image',
+      macZip: 'macOS Archive',
+      other: 'Other Format'
+    }
+  },
+  ja: {
+    dateLocale: 'ja-JP',
+    loading: '最新バージョン情報を取得中...',
+    retry: '再試行',
+    latestVersion: '最新バージョン',
+    releasedOn: 'リリース日:',
+    releaseNotes: '更新内容',
+    proxyText: '中国本土からのアクセス',
+    proxyHint: ' (ミラーサイトを使用)',
+    fileName: 'ファイル名',
+    download: 'ダウンロード',
+    noDownloads: 'ダウンロード可能なファイルがありません',
+    requestFailed: status => `取得に失敗しました: ${status}`,
+    timeout: 'タイムアウトしました。後でもう一度お試しください',
+    fetchFailed: 'バージョン情報の取得に失敗しました。後でもう一度お試しください',
+    fileCount: count => `${count} 個のファイル`,
+    assets: {
+      windowsInstaller: 'Windows インストーラー',
+      linuxAppImage: 'Linux AppImage 実行ファイル',
+      deb: 'Debian/Ubuntu パッケージ',
+      macDmg: 'macOS インストールイメージ',
+      macZip: 'macOS 圧縮ファイル',
+      other: 'その他の形式'
+    }
+  },
+  'zh-TW': {
+    dateLocale: 'zh-TW',
+    loading: '正在獲取最新版本信息...',
+    retry: '重試',
+    latestVersion: '最新版本',
+    releasedOn: '發布於',
+    releaseNotes: '更新說明',
+    proxyText: '我是來自中國大陸',
+    proxyHint: ' (使用鏡像加速下載)',
+    fileName: '檔案名',
+    download: '下載',
+    noDownloads: '暫無可用下載',
+    requestFailed: status => `獲取失敗: ${status}`,
+    timeout: '請求超時，請稍後再試',
+    fetchFailed: '獲取版本信息失敗，請稍後再試',
+    fileCount: count => `${count} 個檔案`,
+    assets: {
+      windowsInstaller: 'Windows 安裝程式',
+      linuxAppImage: 'Linux AppImage 可執行檔案',
+      deb: 'Debian/Ubuntu 安裝包',
+      macDmg: 'macOS 安裝鏡像',
+      macZip: 'macOS 壓縮包',
+      other: '其他格式'
+    }
+  }
+}
+
+const t = computed(() => messages[props.locale] || messages['zh-CN'])
 const releases = ref({})
 const loading = ref(true)
 const error = ref(null)
 const useProxy = ref(false)
 
 const getSystemInfo = fileName => {
-  if (fileName.endsWith('.exe')) return { icon: '💻', name: 'Windows', desc: 'Windows 安装程序' }
-  if (fileName.endsWith('.AppImage')) return { icon: '🐧', name: 'Linux', desc: 'Linux AppImage 可执行文件' }
-  if (fileName.endsWith('.deb')) return { icon: '🐧', name: 'Linux (Debian)', desc: 'Debian/Ubuntu 安装包' }
-  if (fileName.endsWith('.dmg')) return { icon: '🍎', name: 'macOS', desc: 'macOS 安装镜像' }
-  if (fileName.endsWith('mac.zip')) return { icon: '🍎', name: 'macOS', desc: 'macOS 压缩包' }
-  return { icon: '📦', name: '其他', desc: '其他格式' }
+  const assets = t.value.assets
+  if (fileName.endsWith('.exe')) return { icon: '💻', name: 'Windows', desc: assets.windowsInstaller }
+  if (fileName.endsWith('.AppImage')) return { icon: '🐧', name: 'Linux', desc: assets.linuxAppImage }
+  if (fileName.endsWith('.deb')) return { icon: '🐧', name: 'Linux (Debian)', desc: assets.deb }
+  if (fileName.endsWith('.dmg')) return { icon: '🍎', name: 'macOS', desc: assets.macDmg }
+  if (fileName.endsWith('mac.zip')) return { icon: '🍎', name: 'macOS', desc: assets.macZip }
+  return { icon: '📦', name: 'Other', desc: assets.other }
 }
 
 const groupedAssets = computed(() => {
@@ -179,16 +291,16 @@ const fetchReleaseInfo = async () => {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(response.status === 403 ? `${errorData.message}` : `获取失败: ${response.status}`)
+      throw new Error(response.status === 403 ? `${errorData.message}` : t.value.requestFailed(response.status))
     }
 
     releases.value = await response.json()
     loading.value = false
   } catch (e) {
     if (e.name === 'AbortError') {
-      error.value = '请求超时，请稍后再试'
+      error.value = t.value.timeout
     } else {
-      error.value = e.message || '获取版本信息失败，请稍后再试'
+      error.value = e.message || t.value.fetchFailed
     }
     loading.value = false
   }
@@ -200,12 +312,14 @@ onMounted(() => {
 
 const formatDate = dateString => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
+  return date.toLocaleDateString(t.value.dateLocale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
 }
+
+const formatFileCount = count => t.value.fileCount(count)
 
 const formatSize = bytes => {
   const mb = bytes / 1024 / 1024

@@ -1,7 +1,7 @@
 # 快速开始
 
 <a href="https://github.com/orgs/MoeKoeMusic/discussions/940" target="_blank" style="float: right; margin: 0 0 10px 10px; margin-top: -70px;">
-<img src="./public/banner.png" alt="MoeKoe Music Banner" width="200" />
+<img src="/banner.png" alt="MoeKoe Music Banner" width="200" />
 </a>
 
 ## 什么是 MoeKoe Music?
