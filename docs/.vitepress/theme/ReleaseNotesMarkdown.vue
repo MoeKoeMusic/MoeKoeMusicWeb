@@ -1,5 +1,5 @@
 <template>
-  <div class="release-notes-content">
+  <div :class="['release-notes-content', { scrollable }]">
     <template v-for="(block, blockIndex) in blocks" :key="blockIndex">
       <component :is="block.tag" v-if="block.type === 'heading'">
         <template v-for="(token, tokenIndex) in tokenizeMarkdownInline(block.text)" :key="tokenIndex">
@@ -61,6 +61,10 @@ const props = defineProps({
   repoUrl: {
     type: String,
     default: 'https://github.com/iAJue/MoeKoeMusic'
+  },
+  scrollable: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -212,9 +216,12 @@ const tokenProps = token => {
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--vp-c-text-1);
-  max-height: 300px;
   overflow-y: auto;
   text-align: left;
+}
+
+.release-notes-content.scrollable {
+  max-height: 300px;
 }
 
 .release-notes-content h2,
