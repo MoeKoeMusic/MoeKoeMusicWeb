@@ -4,6 +4,7 @@ import LanguageSwitcher from './LanguageSwitcher.vue'
 import SongShareAnalysis from './SongShareAnalysis.vue'
 import PluginMarket from './PluginMarket.vue'
 import DownloadPage from './DownloadPage.vue'
+import ChangelogPage from './ChangelogPage.vue'
 
 export default {
   extends: DefaultTheme,
@@ -12,5 +13,6 @@ export default {
     app.component('SongShareAnalysis', SongShareAnalysis)
     app.component('PluginMarket', PluginMarket)
     app.component('DownloadPage', DownloadPage)
+    app.component('ChangelogPage', ChangelogPage)
   }
 }
