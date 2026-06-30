@@ -5,6 +5,7 @@ import SongShareAnalysis from './SongShareAnalysis.vue'
 import PluginMarket from './PluginMarket.vue'
 import DownloadPage from './DownloadPage.vue'
 import ChangelogPage from './ChangelogPage.vue'
+import ReleaseNotesMarkdown from './ReleaseNotesMarkdown.vue'
 
 export default {
   extends: DefaultTheme,
@@ -14,5 +15,6 @@ export default {
     app.component('PluginMarket', PluginMarket)
     app.component('DownloadPage', DownloadPage)
     app.component('ChangelogPage', ChangelogPage)
+    app.component('ReleaseNotesMarkdown', ReleaseNotesMarkdown)
   }
 }

@@ -104,7 +104,7 @@ const formatSize = (bytes) => {
       <div class="release-notes" v-if="releases.body">
         <details>
           <summary>更新說明</summary>
-          <div class="release-notes-content">{{ releases.body }}</div>
+          <ReleaseNotesMarkdown :body="releases.body" />
         </details>
       </div>
     </div>
@@ -404,19 +404,6 @@ const formatSize = (bytes) => {
 .release-notes summary:hover {
   background: var(--vp-c-bg-mute);
   color: var(--vp-c-brand-dark);
-}
-
-.release-notes-content {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--vp-c-text-1);
-  white-space: pre-line;
-  max-height: 300px;
-  overflow-y: auto;
 }
 
 .region-selector {
