@@ -14,7 +14,7 @@ Release 页面提供了以下 Windows 安装包：
 | `MoeKoe_Music_Setup_vX.X.X-x64.exe` | 仅 64 位，体积更小 |
 | `MoeKoe_Music_Setup_vX.X.X-ia32.exe` | 仅 32 位，适用于老系统 |
 
-1. 从[下载页面](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)获取安装包（不确定架构请选择统一安装包）
+1. 从[下载页面](/download)或[Github](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)获取安装包（不确定架构请选择统一安装包）
 2. 双击运行安装包
 3. 根据安装向导完成安装
 4. 安装完成后，从开始菜单或桌面快捷方式启动应用
@@ -30,7 +30,7 @@ Release 页面提供了以下 Windows 安装包：
 
 > 也可以下载对应的 `.zip` 文件，解压后将应用拖入应用程序文件夹即可。
 
-1. 从[下载页面](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)获取 `.dmg` 文件
+1. 从[下载页面](/download)或[Github](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)获取 `.dmg` 文件
 2. 双击打开 DMG 文件
 3. 将 MoeKoe Music 图标拖动到应用程序文件夹
 4. 从启动台或应用程序文件夹启动应用
@@ -39,7 +39,7 @@ Release 页面提供了以下 Windows 安装包：
 
 ### AppImage 方式（x86_64）
 
-1. 从[下载页面](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)下载 `MoeKoe_Music_vX.X.X-x86_64.AppImage` 文件
+1. 从[下载页面](/download)或[Github](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)下载 `MoeKoe_Music_vX.X.X-x86_64.AppImage` 文件
 2. 为文件添加执行权限:
    ```bash
    chmod +x MoeKoe_Music_*.AppImage
@@ -51,7 +51,7 @@ Release 页面提供了以下 Windows 安装包：
 
 ### Debian/Ubuntu 系统（amd64）
 
-1. 从[下载页面](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)下载 `MoeKoe_Music_vX.X.X-amd64.deb` 包
+1. 从[下载页面](/download)或[Github](https://github.com/MoeKoeMusic/MoeKoeMusic/releases/latest)下载 `MoeKoe_Music_vX.X.X-amd64.deb` 包
 2. 使用以下命令安装:
    ```bash
    sudo dpkg -i MoeKoe_Music_*.deb
