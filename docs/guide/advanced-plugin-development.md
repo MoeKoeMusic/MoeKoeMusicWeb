@@ -179,3 +179,74 @@ Native Host 属于高权限能力，MoeKoe Music 会做以下限制：
 - 只支持 `win32`、`darwin`、`linux` 三个平台声明。
 - 用户必须在插件管理页手动授权后，插件才能发送消息。
 - 插件不能自己修改 Native Host 授权状态。
+
+## 访问本地 API 服务（`moekoe:apiMode`）
+
+除 Native Host 之外，如果插件需要在页面里直接请求客户端的本地 API 服务（HTTP 或 WebSocket），则需要声明 `moekoe:apiMode` 权限。
+
+::: tip 先确认是否需要这个权限
+如果只是想调用酷狗接口（歌单、搜索、用户信息等），请优先使用主世界的 `kugouapi.request()`，它既不需要声明权限，也不依赖本地端口，详见 [迁移插件到 1.7.2 或更高版本](/guide/migrate-plugin-to-1.7.2)。
+:::
+
+### 声明权限
+
+在 `manifest.json` 的 `moekoe_permissions` 中申请 `apiMode`：
+
+```jsonc
+{
+  // ...,
+  "moekoe_permissions": [
+    // ...,
+    "apiMode" // 或者 "moekoe:apiMode"
+  ],
+  // ...,
+}
+```
+
+两种写法等价，客户端都会归一化成 `moekoe:apiMode`。未申请的插件不会触发本地服务。
+
+### 客户端的行为
+
+API 模式是客户端里的一个开关，路径为 `设置` → `系统` → `API模式`（与「RPC地址」相邻），修改后需要重启应用生效。共有三个选项：
+
+| 设置值 | 界面文案 | 行为 |
+| --- | --- | --- |
+| `auto` | 自动决定（默认） | 检测到有插件申请了 `moekoe:apiMode` 时才启动本地服务 |
+| `on` | 始终开启 | 无条件启动本地服务 |
+| `off` | 始终关闭 | 不启动本地服务，申请了该权限的插件**不会被加载** |
+
+插件处于最后一种情况时，插件管理页会把禁用原因标记为 `moekoe:apiMode`，这是预期行为，不是插件损坏。
+
+### 获取 API 终结点
+
+在主世界中调用 `electronAPI.getApiModeUrl()`，不要自己拼地址：
+
+```js
+const apiModeUrl = await electronAPI.getApiModeUrl(); // { http: string, ws: string } | null
+if (!apiModeUrl) throw new Error('API 模式未开启')
+
+const response = await fetch(`${apiModeUrl.http}/playlist/detail?ids=collection_3_25230245_24_0`)
+const { data } = await response.json()
+
+const socket = new WebSocket(apiModeUrl.ws)
+```
+
+- `http`：HTTP 终结点，形如 `http://127.0.0.1:6520`，默认端口为 **6520**。
+- `ws`：WebSocket 终结点，形如 `ws://127.0.0.1:6520/moekoe`。
+- 端口与 WebSocket 路径取自客户端的 `apiModeConfig`，可能被用户改过，因此**不要写死 `6520` 或 `6521`**。
+- 用户关闭 API 模式时返回 `null`。插件声明了该权限时通常不会走到这个分支，因为此时插件根本不会被加载。
+
+WebSocket 能接收歌词与播放状态，也能下发播放控制指令，消息格式见 [WebSocket API 文档](/websocket-api)。
+
+### 可用范围
+
+`electronAPI` 与 `kugouapi` 一样，由客户端 preload 注入到**页面主世界**，因此：
+
+- ✅ 插件弹窗页（`action.default_popup`）等插件自身页面可以直接使用。
+- ❌ 默认的 content script 运行在隔离世界，后台 service worker 中没有 `window`，两者都访问不到，需要由插件页面代为请求后再转发结果。
+
+### 安全与使用建议
+
+- 申请 `moekoe:apiMode` 意味着插件可以在本机端口上收发数据，请只在确实需要时申请，并保持端口仅监听本机。
+- 不要把它当作可选能力：用户关闭 API 模式时插件不会被加载，因此它实际上是插件的运行前提，建议同时在 `minversion` 中要求 `1.7.2` 及以上版本。
+- 客户端不会因为插件申请了该权限就替你打开开关，用户始终可以在设置里关掉它。
